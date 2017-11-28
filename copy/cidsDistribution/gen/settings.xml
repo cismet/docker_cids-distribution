@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <localRepository>${env.MAVEN_LIB_DIR}</localRepository>
+    <profiles>
+        <profile>
+            <id>global-properties</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- used in cismet-parent -->
+                <de.cismet.keystore.path>__KEYSTORE__</de.cismet.keystore.path>
+                <!-- used in cismet-parent -->
+                <de.cismet.keystore.pass>__KEYSTORE_PASSWORD__</de.cismet.keystore.pass>
+                <de.cismet.signing.tsa.server>http://sha256timestamp.ws.symantec.com/sha256/timestamp</de.cismet.signing.tsa.server>
+                
+                <!--
+                    Set distribution specific properties for distribution modules
+                    and override properties defined in parent pom.xml
+                -->
+                <de.cismet.cidsCodebase>${env.CIDS_CODEBASE}</de.cismet.cidsCodebase>
+                <de.cismet.libDir>${env.MAVEN_LIB_DIR}</de.cismet.libDir>
+                <de.cismet.cidsDistDir>${env.CIDS_DISTRIBUTION_DIR}</de.cismet.cidsDistDir>
+                <de.cismet.cidsAccountExtension>${env.CIDS_ACCOUNT_EXTENSION}</de.cismet.cidsAccountExtension>
+                <maven.build.timestamp.format>dd/MM/yyyy</maven.build.timestamp.format>
+            </properties>
+            <repositories>
+                <repository>
+                    <id>cismet-repo</id>
+                    <name>cismet-repo</name>
+                    <url>https://repo.cismet.de/repo</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <checksumPolicy>warn</checksumPolicy>
+                        <updatePolicy>always</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <checksumPolicy>warn</checksumPolicy>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>cismet-repo</id>
+                    <name>cismet-repo</name>
+                    <url>https://repo.cismet.de/repo</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <checksumPolicy>warn</checksumPolicy>
+                        <updatePolicy>always</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <checksumPolicy>warn</checksumPolicy>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <mirrors>
+        <mirror>
+            <id>cismet-repo</id>
+            <name>cismet-repo</name>
+            <url>https://repo.cismet.de/repo</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
+    <servers>
+        <server>
+            <id>cismet-repo</id>
+            <username>__SERVER_USERNAME__</username>
+            <password>__SERVER_PASSWORD__</password>
+        </server>
+    </servers>
+    <activeProfiles>
+        <activeProfile>global-properties</activeProfile>
+        <activeProfile>cismet-inhouse-dev</activeProfile>
+    </activeProfiles>
+</settings>
+
