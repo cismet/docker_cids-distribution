@@ -1,7 +1,7 @@
-ARG BASE_IMAGE_TAG=6.0-debian
-ARG IMAGE_VERSION=6.0-debian
+ARG BASE_IMAGE_TAG=unknown
+ARG IMAGE_VERSION=unknown
 
-FROM cismet/cids-distribution-base:${BASE_IMAGE_TAG}
+FROM reg.cismet.de/abstract/cids-distribution-base:${BASE_IMAGE_TAG}
 
 MAINTAINER Jean-Michel Ruiz <jean.ruiz@cismet.de>
 

@@ -1,10 +1,10 @@
 #!/bin/bash
-IMAGE_VERSION=6.0-debian
+IMAGE_VERSION=6.1-debian
 BASE_IMAGE_TAG=6.0-debian
 
 #----
 
-IMAGE_NAME=cismet/cids-distribution
+IMAGE_NAME=reg.cismet.de/abstract/cids-distribution
 
 docker build \
   --build-arg IMAGE_VERSION=${IMAGE_VERSION} \
