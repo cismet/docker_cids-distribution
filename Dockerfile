@@ -1,9 +1,6 @@
-ARG BASE_IMAGE_TAG=unknown
 ARG IMAGE_VERSION=unknown
 
-FROM reg.cismet.de/abstract/cids-distribution-base:${BASE_IMAGE_TAG}
-
-MAINTAINER Jean-Michel Ruiz <jean.ruiz@cismet.de>
+FROM reg.cismet.de/abstract/cids-distribution-base:6.0-debian
 
 # override account extension and codebase in child autodistribution images!
 ENV CIDS_ACCOUNT_EXTENSION  CidsDistribution
@@ -27,8 +24,8 @@ COPY copy/nginx /etc/nginx/sites-available/
 
 #
 RUN chmod +x ${CIDS_DISTRIBUTION_DIR}/utils/*.sh \
-    && ln -s ${CIDS_DISTRIBUTION_DIR}/utils/cids_ctl.sh ${CIDS_DISTRIBUTION_DIR}/cids_ctl.sh \
-    && ln -s ${CIDS_DISTRIBUTION_DIR}/utils/container_ctl.sh /container_ctl.sh
+  && ln -s ${CIDS_DISTRIBUTION_DIR}/utils/cids_ctl.sh ${CIDS_DISTRIBUTION_DIR}/cids_ctl.sh \
+  && ln -s ${CIDS_DISTRIBUTION_DIR}/utils/container_ctl.sh /container_ctl.sh
 
 # expose cids-server port
 EXPOSE 9986
@@ -43,9 +40,9 @@ EXPOSE 80
 VOLUME /tmp
 
 #
-LABEL de.cismet.cids.distribution.name="cids-distribution image" \
-      de.cismet.cids.distribution.version="${IMAGE_VERSION}" \
-      de.cismet.cids.distribution.tag.docker="${IMAGE_VERSION}" \
-      de.cismet.cids.distribution.tag.git="cidsDistribution-${IMAGE_VERSION}" \
-      de.cismet.cids.distribution.descripton="General abstract cids distribution Runtime Image" 
-
+LABEL maintainer="Jean-Michel Ruiz <jean.ruiz@cismet.de>" \
+  de.cismet.cids.distribution.name="cids-distribution image" \
+  de.cismet.cids.distribution.version="${IMAGE_VERSION}" \
+  de.cismet.cids.distribution.tag.docker="${IMAGE_VERSION}" \
+  de.cismet.cids.distribution.tag.git="cidsDistribution-${IMAGE_VERSION}" \
+  de.cismet.cids.distribution.description="General abstract cids distribution Runtime Image" 
