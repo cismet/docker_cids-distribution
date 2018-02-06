@@ -3,6 +3,7 @@
 cd ${CIDS_DISTRIBUTION_DIR}/server
 
 export STARTER_JAR=${SERVICE}-starter.jar
+export START_OPTIONS=$*
 
 ${CIDS_DISTRIBUTION_DIR}/utils/_cids_service_ctl.master.sh start
 
