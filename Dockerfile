@@ -1,5 +1,3 @@
-ARG IMAGE_VERSION=unknown
-
 FROM reg.cismet.de/abstract/cids-distribution-base:6.0-debian
 
 # override account extension and codebase in child autodistribution images!
@@ -40,9 +38,4 @@ EXPOSE 80
 VOLUME /tmp
 
 #
-LABEL maintainer="Jean-Michel Ruiz <jean.ruiz@cismet.de>" \
-  de.cismet.cids.distribution.name="cids-distribution image" \
-  de.cismet.cids.distribution.version="${IMAGE_VERSION}" \
-  de.cismet.cids.distribution.tag.docker="${IMAGE_VERSION}" \
-  de.cismet.cids.distribution.tag.git="cidsDistribution-${IMAGE_VERSION}" \
-  de.cismet.cids.distribution.description="General abstract cids distribution Runtime Image" 
+LABEL maintainer="Jean-Michel Ruiz <jean.ruiz@cismet.de>"
