@@ -2,6 +2,7 @@
 
 cd ${CIDS_DISTRIBUTION_DIR}/server
 
+export CIDS_STARTER_DIR=${CIDS_LIB_DIR}/starter${CIDS_ACCOUNT_EXTENSION}
 export STARTER_JAR=${SERVICE}-starter.jar
 export START_OPTIONS=$*
 
