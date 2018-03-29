@@ -1,13 +1,24 @@
 #!/bin/bash
 
-cd ${CIDS_DISTRIBUTION_DIR}/server
-
 export CIDS_STARTER_DIR=${CIDS_LIB_DIR}/starter${CIDS_ACCOUNT_EXTENSION}
-export STARTER_JAR=${SERVICE}-starter.jar
 export START_OPTIONS=$*
 
-${CIDS_DISTRIBUTION_DIR}/utils/_cids_service_ctl.master.sh start
+serversPath=${CIDS_DISTRIBUTION_DIR}/server
+cd $serversPath
+for serverDir in $(ls -1 . | grep -E "^[0-9]{3}_.*$" | sort); do
+    export SERVICE_DIR=$serversPath/$serverDir
+    export SERVICE=${serverDir:4}
+    export STARTER_JAR=${SERVICE}-starter.jar
+    export SLEEP_BEFORE_START=1
+
+    ENV_FILE=$serverDir/ENV
+    if [ -f ${ENV_FILE} ]; then
+        source ${ENV_FILE}
+    fi
+
+    sleep ${SLEEP_BEFORE_START}
+    ${CIDS_DISTRIBUTION_DIR}/utils/_cids_service_ctl.master.sh start
+done
 
 echo -e "\n\e[32mhit [CTRL+C] to exit or run 'docker stop <container>'\e[39m:\n"
-
-tail -f ${SERVICE}.out
+tail -f $serversPath/*/serverLog.txt
