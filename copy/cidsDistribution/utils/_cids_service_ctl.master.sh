@@ -1,6 +1,6 @@
 ### GO TO DIRECTORY 
 # -----------------------------------------------------------------------------------------
-SERVICE_DIR=${CIDS_DISTRIBUTION_DIR}/server/
+#SERVICE_DIR=${CIDS_DISTRIBUTION_DIR}/server/
 #SERVICE_DIR=$((readlink -f $0)|sed "s/cs_ctl.sh//")
 # echo CD to $SERVICE_DIR
 cd $SERVICE_DIR
