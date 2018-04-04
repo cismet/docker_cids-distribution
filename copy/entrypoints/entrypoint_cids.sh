@@ -21,4 +21,4 @@ for serverDir in $(ls -1 . | grep -E "^[0-9]{3}_.*$" | sort); do
 done
 
 echo -e "\n\e[32mhit [CTRL+C] to exit or run 'docker stop <container>'\e[39m:\n"
-tail -f $serversPath/*/serverLog.txt
+tail -f $serversPath/*/*.out
