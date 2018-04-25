@@ -3,14 +3,14 @@ cd $SERVICE_DIR
 
 # -----------------------------------------------------------------------------------------
 
-SLACK_PAYLOAD_START="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":rocket: cids Service *${SERVICE}* (${DISTRIBUTION_NAME}) started \", \"icon_emoji\": \":suspension_railway:\"}"
-SLACK_PAYLOAD_STOP="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":cancel: cids Service *${SERVICE}* (${DISTRIBUTION_NAME}) stopped \", \"icon_emoji\": \":suspension_railway:\"}"
-SLACK_PAYLOAD_KILL="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":skull: cids Service *${SERVICE}* (${DISTRIBUTION_NAME}) killed \", \"icon_emoji\": \":suspension_railway:\"}"
+SLACK_PAYLOAD_START="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":rocket: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* started \", \"icon_emoji\": \":suspension_railway:\"}"
+SLACK_PAYLOAD_STOP="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":cancel: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* stopped \", \"icon_emoji\": \":suspension_railway:\"}"
+SLACK_PAYLOAD_KILL="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":skull: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* killed \", \"icon_emoji\": \":suspension_railway:\"}"
 
 function slack {
   if [ ! -z "${SLACK_CHANNEL}" -a ! -z "${SLACK_HOOK}" ]; then
     SLACK_PAYLOAD=$1
-    SLACKER="curl -X POST --data-urlencode ${SLACK_PAYLOAD} ${SLACK_HOOK}"
+    SLACKER="curl -X POST --data-urlencode '${SLACK_PAYLOAD}' '${SLACK_HOOK}'"
     eval "$SLACKER"
   fi
 }
