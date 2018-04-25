@@ -61,17 +61,17 @@ case "$1" in
 	
     start)
         if [ -f "$PID_FILE" ]; then
-	    PID=`cat $PID_FILE`
-	    ps $PID | grep -q "$CMD"
-	    
-	    if [ "$?" -eq 0 ]; then
-	        echo -e "\e[32mINFO\e[39m: \e[1m$SERVICE\e[0m already running (PID: $PID)"
-	    else
-	        echo -e "\e[33mWARN\e[39m: \e[1m$SERVICE\e[0m: stale pid ($PID), removing $SERVICE.pid file and starting service again!"
+#	    PID=`cat $PID_FILE`
+#	    ps $PID | grep -q "$CMD"
+#
+#	    if [ "$?" -eq 0 ]; then
+#	        echo -e "\e[32mINFO\e[39m: \e[1m$SERVICE\e[0m already running (PID: $PID)"
+#	    else
+#	        echo -e "\e[33mWARN\e[39m: \e[1m$SERVICE\e[0m: stale pid ($PID), removing $SERVICE.pid file and starting service again!"
 		rm -f "$PID_FILE"
-                $0 start
+#                $0 start
             fi
-        else
+#        else
             echo -e "\e[32mINFO\e[39m: $CMD"
 
             if [ -f "$OUT_FILE" ]; then
@@ -109,7 +109,7 @@ case "$1" in
                     fi
                 fi
             fi
-        fi
+#        fi
     ;;
     
     restart)
