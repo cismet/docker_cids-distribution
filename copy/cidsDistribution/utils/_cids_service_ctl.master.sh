@@ -28,7 +28,12 @@ MEM_FLAGS=
   MEM_FLAGS="$MEM_FLAGS -Xmx$XMX"
 }
 
-CMD="java -server -XX:+HeapDumpOnOutOfMemoryError ${MEM_FLAGS} -D${CIDS_ACCOUNT_EXTENSION}=$SERVICE -Djava.awt.headless=true -Djava.security.policy=${CIDS_DISTRIBUTION_DIR}/policy.file -Dlog4j.configuration=file:log4j.properties -jar $SERVICE"
+JOLOKIA_FLAG=
+[ -f "jolokia.properties" ] && {
+  JOLOKIA_FLAG="-javaagent:../jolokia-jvm-agent.jar=config=jolokia.properties"
+}
+
+CMD="java -server ${JOLOKIA_FLAG} -XX:+HeapDumpOnOutOfMemoryError ${MEM_FLAGS} -D${CIDS_ACCOUNT_EXTENSION}=$SERVICE -Djava.awt.headless=true -Djava.security.policy=${CIDS_DISTRIBUTION_DIR}/policy.file -Dlog4j.configuration=file:log4j.properties -jar $SERVICE"
 if [ ! -z "$START_OPTIONS" ]; then
   CMD="$CMD $START_OPTIONS"
 fi 

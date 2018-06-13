@@ -20,6 +20,8 @@ COPY copy/cidsDistribution/ ./
 COPY copy/entrypoints/ /
 COPY copy/nginx /etc/nginx/sites-available/
 
+ADD http://search.maven.org/remotecontent?filepath=org/jolokia/jolokia-jvm/1.5.0/jolokia-jvm-1.5.0-agent.jar /cidsDistribution/server/jolokia-jvm-agent.jar
+
 #
 RUN chmod +x ${CIDS_DISTRIBUTION_DIR}/utils/*.sh \
   && ln -s ${CIDS_DISTRIBUTION_DIR}/utils/cids_ctl.sh ${CIDS_DISTRIBUTION_DIR}/cids_ctl.sh \
