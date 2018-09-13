@@ -5,14 +5,14 @@ cd $SERVICE_DIR
 ### SLACKER
 # -----------------------------------------------------------------------------------------
 
-SLACK_PAYLOAD_START="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":rocket: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* started \", \"icon_emoji\": \":suspension_railway:\"}"
-SLACK_PAYLOAD_STOP="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":cancel: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* stopped \", \"icon_emoji\": \":suspension_railway:\"}"
-SLACK_PAYLOAD_KILL="payload={\"channel\": \"${SLACK_CHANNEL}\", \"username\": \"tiffi\", \"text\": \":skull: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* killed \", \"icon_emoji\": \":suspension_railway:\"}"
+SLACK_MESSAGE_START=":rocket: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* started"
+SLACK_MESSAGE_STOP=":cancel: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* stopped"
+SLACK_MESSAGE_KILL=":skull: cids Service *${SERVICE} [${DISTRIBUTION_NAME}]* killed"
 
 function slack {
   if [ ! -z "${SLACK_CHANNEL}" -a ! -z "${SLACK_HOOK}" ]; then
-    SLACK_PAYLOAD=$1
-    SLACKER="curl -X POST --data-urlencode '${SLACK_PAYLOAD}' '${SLACK_HOOK}'"
+    SLACK_MESSAGE=$1
+    SLACKER="slack.sh -u \"${SLACK_USER}\" -m \"${SLACK_MESSAGE}\" -c \"${SLACK_CHANNEL}\" -i \":suspension_railway:\""
     eval "$SLACKER"
   fi
 }
@@ -69,7 +69,7 @@ case "$1" in
     nohup $CMD &>> "$OUT_FILE" & RESULT=$?
     PID=$!
 
-    slack "${SLACK_PAYLOAD_START}"
+    slack "${SLACK_MESSAGE_START}"
 
     if [ "$RESULT" -ne 0 ]; then
       echo -e "\e[31mERROR\e[39m: \e[1m$SERVICE\e[0m could not be started: $RESULT"
@@ -101,13 +101,13 @@ case "$1" in
    stop)
     if [ -f "$PID_FILE" ]; then
     kill `cat "$PID_FILE"`
-      slack "${SLACK_PAYLOAD_STOP}"
+      slack "${SLACK_MESSAGE_STOP}"
       sleep 3
     
       if [ "$?" -ne 0 ]; then
     echo -e "\e[31mERROR\e[39m: \e[1m$SERVICE\e[0m could not be stopped, trying to kill service"
     kill -9 `cat "$PID_FILE"`
-        slack "${SLACK_PAYLOAD_KILL}"
+        slack "${SLACK_MESSAGE_KILL}"
       fi
 
     rm -f "$PID_FILE"

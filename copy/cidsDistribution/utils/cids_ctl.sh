@@ -15,7 +15,8 @@ list_server_dirs() {
 list_services() {
     for SERVER_DIR in $(list_server_dirs); do
         SERVICE=${SERVER_DIR:4}
-        ENV_FILE=${SERVERS_PATH}/${SERVER_DIR}/ENV
+        SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
+        ENV_FILE=${SERVICE_DIR}/ENV
         if [ -f ${ENV_FILE} ]; then
             source ${ENV_FILE}
         fi
@@ -29,7 +30,8 @@ get_server_dir() {
 
     for SERVER_DIR in $(list_server_dirs); do
         SERVICE=${SERVER_DIR:4}
-        ENV_FILE=${SERVERS_PATH}/${SERVER_DIR}/ENV
+        SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
+        ENV_FILE=${SERVICE_DIR}/ENV
         if [ -f ${ENV_FILE} ]; then
             source ${ENV_FILE}
         fi
@@ -47,7 +49,7 @@ start_server() {
     SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
     STARTER_JAR=${SERVICE}-starter.jar
     SLEEP_BEFORE_START=1
-    ENV_FILE=${SERVERS_PATH}/${SERVER_DIR}/ENV
+    ENV_FILE=${SERVICE_DIR}/ENV
     if [ -f ${ENV_FILE} ]; then
         source ${ENV_FILE}
     fi
@@ -63,7 +65,7 @@ stop_server() {
     SERVER_DIR=$(get_server_dir ${SERVICE})    
     SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
     SLEEP_BEFORE_STOP=1
-    ENV_FILE=${SERVERS_PATH}/${SERVER_DIR}/ENV
+    ENV_FILE=${SERVICE_DIR}/ENV
     if [ -f ${ENV_FILE} ]; then
         source ${ENV_FILE}
     fi
@@ -78,7 +80,7 @@ log() {
     SERVICE=$1
     SERVER_DIR=$(get_server_dir ${SERVICE})    
     SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
-    ENV_FILE=${SERVERS_PATH}/${SERVER_DIR}/ENV
+    ENV_FILE=${SERVICE_DIR}/ENV
     if [ -f ${ENV_FILE} ]; then
         source ${ENV_FILE}
     fi
@@ -90,12 +92,26 @@ follow() {
     SERVICE=$1
     SERVER_DIR=$(get_server_dir ${SERVICE})    
     SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
-    ENV_FILE=${SERVERS_PATH}/${SERVER_DIR}/ENV
+    ENV_FILE=${SERVICE_DIR}/ENV
     if [ -f ${ENV_FILE} ]; then
         source ${ENV_FILE}
     fi
 
     tail -f ${SERVICE_DIR}/${SERVICE}.out
+}
+
+integrity() {
+    SERVICE=$1
+    CHECK_FORLDER=$2
+    SERVER_DIR=$(get_server_dir ${SERVICE})    
+    SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
+    INTEGRITY_FILE=${SERVICE_DIR}/.integrity
+    if [ -f ${INTEGRITY_FILE} ]; then
+        cd ${SERVICE_DIR}
+        teg ${CHECK_FORLDER}        
+    else
+        echo "Sorry, There is no .integrity file. I can't execute integrity checks..."
+    fi    
 }
 
 ### OPTIONS
@@ -119,11 +135,19 @@ case "$1" in
         $0 start ${SERVICE}
     ;;
 
+    integrity)
+        SERVICE=$2
+        CHECK_FOLDER=$3
+        integrity ${SERVICE} ${CHECK_FOLDER}
+    ;;
+
     follow)
+        SERVICE=$2
         follow ${SERVICE}
     ;;
 
     log)
+        SERVICE=$2
         log ${SERVICE}
     ;;
 
@@ -132,7 +156,7 @@ case "$1" in
     ;;
 
     *)
-        echo "Usage: $0 {list_services|{start|stop|restart|log|follow} {SERVICE (optional)}}"
+        echo "Usage: $0 {list_services|{start|stop|restart|log|follow|integrity} {SERVICE (optional)}}"
     ;;
 
 esac
