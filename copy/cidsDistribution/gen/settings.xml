@@ -12,7 +12,7 @@
                 <de.cismet.keystore.path>__KEYSTORE__</de.cismet.keystore.path>
                 <!-- used in cismet-parent -->
                 <de.cismet.keystore.pass>__KEYSTORE_PASSWORD__</de.cismet.keystore.pass>
-                <de.cismet.signing.tsa.server>http://sha256timestamp.ws.symantec.com/sha256/timestamp</de.cismet.signing.tsa.server>
+                <de.cismet.signing.tsa.server>${env.TSA_SERVER}</de.cismet.signing.tsa.server>
                 
                 <!--
                     Set distribution specific properties for distribution modules
