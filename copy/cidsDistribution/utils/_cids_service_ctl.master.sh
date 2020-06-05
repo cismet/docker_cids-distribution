@@ -28,6 +28,14 @@ MEM_FLAGS=
   MEM_FLAGS="$MEM_FLAGS -Xmx$XMX"
 }
 
+##################################
+echo DEBUGPORT $DEBUGPORT
+DEBUGGING=
+[ -n "$DEBUGPORT" ] && {
+  DEBUGGING="-agentlib:jdwp=transport=dt_socket,address=$DEBUGPORT,suspend=n,server=y"
+}
+##################################
+
 JOLOKIA_FLAG=
 [ -f "jolokia.properties" ] && {
   JOLOKIA_FLAG="-javaagent:/cidsDistribution/utils/jolokia-jvm-agent.jar=config=jolokia.properties"

@@ -55,8 +55,7 @@ start_server() {
     fi
 
     sleep ${SLEEP_BEFORE_START}
-
-    export SERVICE SERVICE_DIR STARTER_JAR START_OPTIONS XMS XMX
+    export SERVICE SERVICE_DIR STARTER_JAR START_OPTIONS XMS XMX DEBUGPORT
     ${CIDS_DISTRIBUTION_DIR}/utils/_cids_service_ctl.master.sh start
 }
 
