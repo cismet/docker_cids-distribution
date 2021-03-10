@@ -18,6 +18,10 @@ if [ -z ${MAVEN_BUID_COMMAND} ];  then
 fi
 source ${CIDS_DISTRIBUTION_DIR}/utils/_build_autodistribution.master.sh
 
+if [ 1 -eq "$SIGN_INT" ]; then
+  ${CIDS_DISTRIBUTION_DIR}/utils/sign_all.sh ${CIDS_DISTRIBUTION_DIR}/lib/int
+fi
+
 if [ ! -z "${GIT_DISTRIBUTION_RELEASE}" ]; then
   rm -rf ${AUTO_DISTRIBUTION_DIR}
 fi
