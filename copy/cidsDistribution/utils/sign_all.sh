@@ -35,7 +35,7 @@ else
 fi
 
 if [[ -z $4 ]] ; then
-    TSA="http://dse200.ncipher.com/TSS/HttpTspServer"
+    TSA="${TSA_SERVER}"
 else
     TSA=$4
 fi
