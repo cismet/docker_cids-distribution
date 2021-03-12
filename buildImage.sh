@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=reg.cismet.de/abstract/cids-distribution:6.7-debian
+IMAGE=reg.cismet.de/abstract/cids-distribution:7.0-debian
 
 #----
 
