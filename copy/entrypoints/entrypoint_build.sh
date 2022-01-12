@@ -11,7 +11,7 @@ if [ ! -z "${GIT_DISTRIBUTION_RELEASE}" ]; then
   curl -fsSL ${GIT_DISTRIBUTION_DOWNLOAD_URL} | tar -xz -C ${AUTO_DISTRIBUTION_DIR} --strip-components=1
 fi
 
-cd /cidsDistribution/scripts/before-build/ && \
+cd "${CIDS_DISTRIBUTION_DIR}/scripts/before-build/" && \
 for SCRIPT in $(ls -1 | grep -E "^[0-9]{3}_.*$" | sort); do
   echo "executing before-build script $SCRIPT ..."
   source $SCRIPT;
@@ -31,7 +31,7 @@ if [ 1 -eq "$SIGN_INT" ]; then
   ${CIDS_DISTRIBUTION_DIR}/utils/sign_all.sh ${CIDS_DISTRIBUTION_DIR}/lib/int
 fi && cd -
 
-cd /cidsDistribution/scripts/after-build/ && \
+cd "${CIDS_DISTRIBUTION_DIR}/scripts/after-build/" && \
 for SCRIPT in $(ls -1 | grep -E "^[0-9]{3}_.*$" | sort); do
   echo "executing after-build script $SCRIPT ..."
   source $SCRIPT;
