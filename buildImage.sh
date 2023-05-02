@@ -1,9 +1,13 @@
 #!/bin/bash
 
-IMAGE=reg.cismet.de/abstract/cids-distribution:8.0-debian
+IMAGE_NAME=reg.cismet.de/abstract/cids-distribution
+IMAGE_VERSION=8.0-debian
 
-#----
 
+# RELEASE BUILD ----------------------------------------------------------------
 docker build \
-  -t ${IMAGE} \
+  -f Dockerfile \
+  --build-arg IMAGE_VERSION=${IMAGE_VERSION} \
+  -t ${IMAGE_NAME} \
+  -t ${IMAGE_NAME}:${IMAGE_VERSION} \
   .

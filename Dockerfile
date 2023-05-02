@@ -47,4 +47,10 @@ EXPOSE 80
 VOLUME /tmp
 
 #
+LABEL de.cismet.cids.java.maven.name="cids-distribution runtime image" \
+      de.cismet.cids.java.maven.version="cids-distribution ${IMAGE_VERSION}" \
+      de.cismet.cids.java.maven.tag.docker="cids-distribution ${IMAGE_VERSION}" \
+      de.cismet.cids.java.maven.tag.git="cids-distribution:${IMAGE_VERSION}" \
+      de.cismet.cids.java.maven.description="Cids-Distribution Runtime Image" 
+
 LABEL maintainer="Jean-Michel Ruiz <jean.ruiz@cismet.de>"
