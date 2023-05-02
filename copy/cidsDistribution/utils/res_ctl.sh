@@ -1,5 +1,6 @@
 #!/bin/bash
 DIR=$(dirname "$(readlink -f "$0")")
+PATH="${PATH}:${JAVA_HOME}/bin"
 
 #####
 
@@ -147,17 +148,20 @@ function rebuildGetdownApps {
 #####
 
 function deployChangedJars {
+    SOURCE="${LOCAL}/src/plain"
     UNPACKED="${TMP}/unpacked"
     UNSIGNED="${TMP}/unsigned"
     CLERKSTER_SIGNED="${TMP}/clerkster"
     SELF_SIGNED="${TMP}/signed"
+
+    if [ ! -z "$1" ]; then SOURCE="$1"; shift; fi
 
     mkdir -p "${UNPACKED}" "${UNSIGNED}" "${SELF_SIGNED}" "${CLERKSTER_SIGNED}"
 
     unpackJars "${UNPACKED}" "${LOCAL}/*.jar"
 
     echo "searching for changed resources ..."
-    diffs="$(diffUnpackedJars "${UNPACKED}" "${LOCAL}/src/plain/*")"
+    diffs="$(diffUnpackedJars "${UNPACKED}" "${SOURCE}/*")"
     rm -r "${UNPACKED}"
 
     if [ -z "${diffs}" ]; then
@@ -186,7 +190,8 @@ case "$COMMAND" in
     ;;
 	
     deployChanged)
-        deployChangedJars
+        SOURCE=$1; shift
+        deployChangedJars $SOURCE
     ;;    
 
     *)
