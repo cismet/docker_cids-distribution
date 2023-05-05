@@ -47,7 +47,7 @@ start_server() {
     SERVICE=$1
     SERVER_DIR=$(get_server_dir ${SERVICE})
     SERVICE_DIR=${SERVERS_PATH}/${SERVER_DIR}
-    STARTER_JAR=${SERVICE}-starter.jar
+    STARTER_JAR=${STARTER_JAR:-${SERVICE}-starter.jar}
     SLEEP_BEFORE_START=1
     ENV_FILE=${SERVICE_DIR}/ENV
     if [ -f ${ENV_FILE} ]; then
