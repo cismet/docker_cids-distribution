@@ -42,7 +42,13 @@ JOLOKIA_FLAG=
 }
 
 R_FLAG=
-if [ ! -z "${RUNTIME_PROPERTIES}" ]; then R_FLAG="-r ${RUNTIME_PROPERTIES}"; fi
+if [ ! -z "${RUNTIME_PROPERTIES}" ]; then 
+  if [ ! -z "${REST_API}" -a "${REST_API}" == "true" ]; then 
+    R_FLAG="@${RUNTIME_PROPERTIES}"; 
+  else
+    R_FLAG="-r ${RUNTIME_PROPERTIES}"; 
+  fi
+fi
 CMD="java -server ${JOLOKIA_FLAG} ${DEBUGGING} -XX:+HeapDumpOnOutOfMemoryError ${MEM_FLAGS} -D${CIDS_ACCOUNT_EXTENSION}=$SERVICE -Djava.awt.headless=true -Djava.security.policy=${CIDS_DISTRIBUTION_DIR}/policy.file -Dlog4j.configuration=file:log4j.properties -jar $SERVICE ${R_FLAG}"
 if [ ! -z "$START_OPTIONS" ]; then
   CMD="$CMD $START_OPTIONS"
