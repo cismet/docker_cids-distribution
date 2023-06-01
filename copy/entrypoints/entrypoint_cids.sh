@@ -32,10 +32,10 @@ trap true SIGTERM
 tail -f /dev/null &
 wait $!
 
-for SERVICE in $(${CIDS_CTL} list_services); do
-  if [ "${MODE}" == "single" ]; then
-    ${CIDS_CTL} stop
-  else
+if [ "${MODE}" == "single" ]; then
+  ${CIDS_CTL} stop
+else
+  for SERVICE in $(${CIDS_CTL} list_services); do
     ${CIDS_CTL} stop ${SERVICE}
-  fi
-done
+  done
+fi
