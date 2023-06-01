@@ -19,19 +19,27 @@ prepare() {
     RUNTIME_PROPERTY_REGEX="^RUNTIME_PROPERTY_(.*)=(.*)$"
     RUNTIME_PROPERTY_KEY_MATCH="\\1"
     RUNTIME_PROPERTY_VALUE_MATCH="\\2"
-    for ENV_RUNTIME_PROPERTY in $(env | grep -E "$RUNTIME_PROPERTY_REGEX"); do
+    while read -r ENV_RUNTIME_PROPERTY; do
         RUNTIME_PROPERTY_KEY=("$(echo "${ENV_RUNTIME_PROPERTY}" | sed -E 's#'"$RUNTIME_PROPERTY_REGEX"'#'"$RUNTIME_PROPERTY_KEY_MATCH"'#')")
         RUNTIME_PROPERTY_VALUE=("$(echo "${ENV_RUNTIME_PROPERTY}" | sed -E 's#'"$RUNTIME_PROPERTY_REGEX"'#'"$RUNTIME_PROPERTY_VALUE_MATCH"'#')")
-        APPEND_RUNTIME_PROPERTIES+="${RUNTIME_PROPERTY_KEY}=${RUNTIME_PROPERTY_VALUE}\n"
-    done
+        if [ ! -z "${REST_API}" -a "${REST_API}" == "true" ]; then
+            APPEND_RUNTIME_PROPERTIES+="-${RUNTIME_PROPERTY_KEY} = ${RUNTIME_PROPERTY_VALUE}\n"
+        else
+            APPEND_RUNTIME_PROPERTIES+="${RUNTIME_PROPERTY_KEY}=${RUNTIME_PROPERTY_VALUE}\n"
+        fi
+    done <<< $(env | grep -E "$RUNTIME_PROPERTY_REGEX")
 
     ORIG_RUNTIME_PROPERTIES=${SERVICE_DIR}/runtime.properties
     RUNTIME_PROPERTIES="${ORIG_RUNTIME_PROPERTIES}"
     if [ ! -z "${APPEND_RUNTIME_PROPERTIES}" ]; then
         TMP_RUNTIME_PROPERTIES="${CIDS_CTL_DIR}/runtime.properties"
         echo -e "$(
-            sed -E 's#^(.*)=runtime.properties\s*$#\1='"${TMP_RUNTIME_PROPERTIES}"'#g' ${ORIG_RUNTIME_PROPERTIES}
-            echo -e "\nproperties.appended=true"
+            sed -E 's#^(.*)=(\w*)runtime.properties\s*$#\1=\2'"${TMP_RUNTIME_PROPERTIES}"'#g' ${ORIG_RUNTIME_PROPERTIES}
+            if [ ! -z "${REST_API}" -a "${REST_API}" == "true" ]; then
+                echo -e "\n-properties.appended = true"
+            else
+                echo -e "\nproperties.appended=true"
+            fi
             echo -e "\n${APPEND_RUNTIME_PROPERTIES}"
         )" > "${TMP_RUNTIME_PROPERTIES}"
         RUNTIME_PROPERTIES="${TMP_RUNTIME_PROPERTIES}"
@@ -68,7 +76,7 @@ start_server() {
         source ${CIDS_CTL_FILE}
     fi
 
-    export RUNTIME_PROPERTIES STARTER_JAR START_OPTIONS XMS XMX DEBUGPORT
+    export RUNTIME_PROPERTIES STARTER_JAR START_OPTIONS XMS XMX DEBUGPORT REST_API
     ${CIDS_DISTRIBUTION_DIR}/utils/_cids_service_ctl.master.sh start
 }
 
