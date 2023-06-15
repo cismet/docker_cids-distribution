@@ -2,11 +2,16 @@
 
 KEYS_REGEX="^GIT_ORIGIN_(.*)=.*$"
 KEYS_MATCH="\\1"
-KEYS=()
 export GIT_ORIGIN__=${GIT_ORIGIN}
-for ENV_GIT_ORIGIN in $(env | grep -E "$KEYS_REGEX"); do
-  KEYS+=("$(echo "${ENV_GIT_ORIGIN}" | sed -E 's#'"$KEYS_REGEX"'#'"$KEYS_MATCH"'#')")
-done
+
+KEYS=()
+if [ $# -gt 0 ]; then
+  KEYS+=("$*")
+else
+  for ENV_GIT_ORIGIN in $(env | grep -E "$KEYS_REGEX"); do
+    KEYS+=("$(echo "${ENV_GIT_ORIGIN}" | sed -E 's#'"$KEYS_REGEX"'#'"$KEYS_MATCH"'#')")
+  done
+fi
 
 for KEY in ${KEYS[@]}; do
   GIT_ORIGIN_VAR=GIT_ORIGIN_$KEY
@@ -27,6 +32,6 @@ for KEY in ${KEYS[@]}; do
   [[ -d "${GIT_TARGET_VALUE}" ]] || mkdir -p "${GIT_TARGET_VALUE}" && cd ${GIT_TARGET_VALUE} || exit 20
   # creating local git repo if necessary
   [[ -d .git ]] || ( git init && git remote add origin ${GIT_ORIGIN_VALUE} ) || exit 30
-  # fetching origin and checking branch
-  git fetch origin ${GIT_BRANCH_VALUE} && git checkout ${GIT_BRANCH_VALUE} || exit 40
+  # pulling branch from origin
+  git fetch origin ${GIT_BRANCH_VALUE} && git checkout ${GIT_BRANCH_VALUE} && git pull || exit 40
 done
