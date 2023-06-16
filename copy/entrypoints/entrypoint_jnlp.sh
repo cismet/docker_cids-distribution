@@ -7,9 +7,7 @@ fi
 
 /cidsDistribution/utils/checkoutFromRepo.sh
 /cidsDistribution/utils/rewriteClientConfigs.sh
-if [ ! -z "${CLIENT_RESOURCES_PLAIN}" ]; then
-  /cidsDistribution/utils/res_ctl.sh deployChanged ${CLIENT_RESOURCES_PLAIN}
-fi
+/cidsDistribution/utils/res_ctl.sh init
 
 echo -e "\e[32mINFO\e[39m: starting nginx"
 sed -i -- "s#__CIDS_DISTRIBUTION_DIR__#${CIDS_DISTRIBUTION_DIR:-/cidsDistribution}#g" /etc/nginx/sites-available/default
