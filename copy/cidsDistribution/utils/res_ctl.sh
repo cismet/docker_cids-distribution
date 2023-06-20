@@ -90,7 +90,7 @@ function diffUnpackedJars {
   TO="$1"; shift
   FROM="$*"
   for fromPath in ${FROM}; do 
-    if [ -f ${fromPath} ]; then 
+    if [ -d ${fromPath} ]; then 
         diffUnpackedJar "$TO" "${fromPath}"; 
         if [ $? -ne 0 ]; then
             echo "${fromPath}"
@@ -176,8 +176,8 @@ function rebuildChangedResourceJars {
 
   unpackJars "${UNPACKED}" "${LOCAL}/*.jar"
 
-  echo "# indenfiying changes in ${FROM} with ${TO}"
-  diffs="$(diffUnpackedJars "${UNPACKED}" "${SOURCES}/*")"
+  echo "# indenfiying changes in ${UNPACKED} with ${SOURCES}"
+  diffs="$(diffUnpackedJars "${UNPACKED}" "${SOURCES}"/*)"
   rm -r "${UNPACKED}"
 
   if [ -z "${diffs}" ]; then
@@ -340,7 +340,11 @@ case "$COMMAND" in
   ;;  
 
   init)
-    if [ ! -z "${CLIENT_RESOURCES_PLAIN}" ]; then
+    if [ ! -z "${CLIENT_RESOURCES_PLAIN}" -a -d "${CLIENT_RESOURCES_PLAIN}" ]; then
+      if [ ! -z "${CLIENT_RESOURCES_OVERWRITE}" -a -d "${CLIENT_RESOURCES_OVERWRITE}" ]; then
+        cp -r "${CLIENT_RESOURCES_OVERWRITE}"/* "${CLIENT_RESOURCES_PLAIN}"/
+      fi
+    
       rebuildChangedResourceJars "${CLIENT_RESOURCES_PLAIN}"
       deployGetdownJars "${LOCAL}/*.jar"
     fi
