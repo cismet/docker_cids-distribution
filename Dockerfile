@@ -34,6 +34,15 @@ RUN chmod +x ${CIDS_DISTRIBUTION_DIR}/utils/*.sh \
   && ln -s /cidsDistribution/utils/integrity/lib/integrity.sh /cidsDistribution/utils/teg
 #postgresql-client
 
+# install csconf
+RUN git clone https://github.com/cismet/cs-conf.git /usr/local/src/cs-conf \
+  && cd /usr/local/src/cs-conf \
+  && npm install -g @babel/node \
+  && npm install @babel/cli @babel/preset-env --save-dev \
+  && npm run test \
+  && npm run build \
+  && npm install -g
+
 # expose cids-server port
 EXPOSE 9986
 

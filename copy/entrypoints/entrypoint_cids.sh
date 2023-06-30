@@ -16,6 +16,7 @@ fi
 if [ "${MODE}" == "single" ]; then
   ${CIDS_CTL} pull
   ${CIDS_CTL} prepare
+  ${CIDS_CTL} csconf-import
   ${CIDS_CTL} integrity checks_startup
   ${CIDS_CTL} start
   ${CIDS_CTL} follow &

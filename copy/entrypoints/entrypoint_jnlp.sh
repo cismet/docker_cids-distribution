@@ -5,7 +5,7 @@ if [ ! -z "${EXEC_BEFORE_START}" ]; then
   bash -c "${EXEC_BEFORE_START}" || exit 1;
 fi
 
-/cidsDistribution/utils/checkoutFromRepo.sh
+/cidsDistribution/utils/cids_ctl_single.sh pull
 /cidsDistribution/utils/rewriteClientConfigs.sh
 /cidsDistribution/utils/res_ctl.sh init
 

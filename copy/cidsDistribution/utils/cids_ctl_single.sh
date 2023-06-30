@@ -9,7 +9,7 @@ SERVERS_PATH="${CIDS_DISTRIBUTION_DIR}/server"
 CIDS_CTL_FILE="${SERVERS_PATH}/.cids_ctl"
 
 pull() {
-    /cidsDistribution/utils/checkoutFromRepo.sh
+    /cidsDistribution/utils/checkoutFromRepo.sh $1
 }
 
 prepare() {
@@ -69,6 +69,24 @@ export DOT_INTEGRITY=${DOT_INTEGRITY}
 export SERVICE_DIR=${SERVICE_DIR}
 export STARTER_JAR=${STARTER_JAR}
 EOF
+}
+
+csconf_import() {
+    if [ -d "${CSCONF_CONFIG_DIR}" ]; then
+        CIDS_CTL_FILE="${SERVERS_PATH}/.cids_ctl"
+        source "${CIDS_CTL_FILE}"
+
+        csconf import -r "${RUNTIME_PROPERTIES}" -c "${CSCONF_CONFIG_DIR}" -b "${CSCONF_BACKUPS_DIR}" -v
+    fi
+}
+
+csconf_updatePermissions() {
+    if [ -d "${CSCONF_CONFIG_DIR}" ]; then
+        CIDS_CTL_FILE="${SERVERS_PATH}/.cids_ctl"
+        source "${CIDS_CTL_FILE}"
+
+        csconf updatePermissions -r "${RUNTIME_PROPERTIES}" -c "${CSCONF_CONFIG_DIR}" -b "${CSCONF_BACKUPS_DIR}" -v
+    fi
 }
 
 start_server() {
@@ -133,8 +151,28 @@ case "$1" in
         pull
     ;;
 
+    pull-configs)
+        pull configs
+    ;;
+
+    pull-resources)
+        pull resources
+    ;;
+
+    pull-csconf)
+        pull csconf
+    ;;
+
     prepare)
         prepare
+    ;;
+
+    csconf-import)
+        csconf_import
+    ;;
+
+    csconf-updatePermissions)
+        csconf_updatePermissions
     ;;
 
     start)
@@ -164,7 +202,7 @@ case "$1" in
     ;;
 
     *)
-        echo "Usage: $0 {pull|prepare|start|stop|restart|log|follow|integrity {CHECK_FOLDER (optional)}}"
+        echo "Usage: $0 {pull|pull-configs|pull-resources|pull-csconf|prepare|csconf-import|csconf-updatePermissions|start|stop|restart|log|follow|integrity {CHECK_FOLDER (optional)}}"
     ;;
 
 esac

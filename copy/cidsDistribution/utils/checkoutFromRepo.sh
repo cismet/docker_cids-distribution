@@ -33,5 +33,5 @@ for KEY in ${KEYS[@]}; do
   # creating local git repo if necessary
   [[ -d .git ]] || ( git init && git remote add origin ${GIT_ORIGIN_VALUE} ) || exit 30
   # pulling branch from origin
-  git fetch origin ${GIT_BRANCH_VALUE} && git checkout ${GIT_BRANCH_VALUE} && git pull || exit 40
+  git fetch origin ${GIT_BRANCH_VALUE} && git reset --hard origin/${GIT_BRANCH_VALUE} || exit 40
 done
