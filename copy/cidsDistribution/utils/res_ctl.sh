@@ -2,12 +2,33 @@
 DIR=$(dirname "$(readlink -f "$0")")
 PATH="${PATH}:${JAVA_HOME}/bin"
 
+# external variables:
+#  CLIENT_RESOURCES_PLAIN     (where are the sources)
+#  CLIENT_RESOURCES_OVERWRITE (where are the overwrite sources)
+#  CLIENT_RESOURCES_TARGET    (where should the compiled jars be build into)
+#  CIDSDISTRIBUTION_HOST      (when modifying starters, which host should be used as a clients backreference host)
+#  CIDS_DISTRIBUTION_DIR      (comes from the distribution project, almost certainly set to '/cidsDistribution')
+#  CIDS_EXTENSION             (comes from the distribution project, probably 'WuNDa', 'WRRLDBMV' or something like that)
+
 #####
 
 SESSION="$(echo ${RANDOM} | md5sum | head -c 8)"
 TMP_SESSION_DIR="/tmp/${SESSION}"
 
-LOCAL="${CIDS_DISTRIBUTION_DIR}/lib/local${CIDS_EXTENSION}"
+if [ ! -z "${CLIENT_RESOURCES_PLAIN}" ]; then
+  DEFAULT_SOURCE=${CLIENT_RESOURCES_PLAIN}
+elif [ ! -z "${GIT_TARGET_resources}" ] ; then
+  DEFAULT_SOURCE="${GIT_TARGET_resources}/plain"
+else
+  DEFAULT_SOURCE="${DEFAULT_TARGET}/src/plain"
+fi
+
+if [ ! -z "${CLIENT_RESOURCES_TARGET}" ]; then
+  DEFAULT_TARGET=${CLIENT_RESOURCES_TARGET}
+else
+  DEFAULT_TARGET="${CIDS_DISTRIBUTION_DIR}/lib/local${CIDS_EXTENSION}"
+fi
+
 
 KEYSTORE="${CIDS_DISTRIBUTION_DIR}/signing/keystore.jks"
 KEYSTORE_PASS=$(cat "${CIDS_DISTRIBUTION_DIR}/signing/keystore.pass")
@@ -162,8 +183,12 @@ function rebuildGetdownApps {
 #####
 
 function rebuildChangedResourceJars {
-  [ $# -eq 0 ] && echo "SOURCES parameter is mandatory" && exit 1;
-  SOURCES=$1
+  SOURCE=${1:-${DEFAULT_SOURCE}};
+  TARGET=${2:-${DEFAULT_TARGET}};
+
+  echo "### rebuilding changed jars from '${SOURCE}' to '${TARGET}'"
+
+  [ -z "${SOURCE}" -o -z "${TARGET}" ] && echo "SOURCE AND TARGET parameter are mandatory" && exit 1;
 
   TMP_DIR="${TMP_SESSION_DIR}-rebuildChangedResourceJars"
   UNPACKED="${TMP_DIR}/unpacked"
@@ -174,10 +199,10 @@ function rebuildChangedResourceJars {
   echo "### rebuilding changed resource jar"
   mkdir -p "${UNPACKED}"
 
-  unpackJars "${UNPACKED}" "${LOCAL}/*.jar"
+  unpackJars "${UNPACKED}" "${TARGET}/*.jar"
 
-  echo "# indenfiying changes in ${UNPACKED} with ${SOURCES}"
-  diffs="$(diffUnpackedJars "${UNPACKED}" "${SOURCES}"/*)"
+  echo "# indenfiying changes in ${UNPACKED} with ${SOURCE}"
+  diffs="$(diffUnpackedJars "${UNPACKED}" "${SOURCE}"/*)"
   rm -r "${UNPACKED}"
 
   if [ -z "${diffs}" ]; then
@@ -201,7 +226,7 @@ function rebuildChangedResourceJars {
     && rm "${SELF_SIGNED}"/*.jar \
     && rmdir "${SELF_SIGNED}"
 
-    deployFiles "${LOCAL}" "${CLERKSTER_SIGNED}/*.jar" \
+    deployFiles "${TARGET}" "${CLERKSTER_SIGNED}/*.jar" \
     && rm "${CLERKSTER_SIGNED}"/*.jar \
     && rmdir "${CLERKSTER_SIGNED}"
   fi
@@ -331,22 +356,26 @@ case "$COMMAND" in
   ;;
 
   deployChanged)
-    SOURCES=${1:-"${LOCAL}/src/plain"}; shift
+    SOURCE=${1:-${DEFAULT_SOURCE}}; shift
+    TARGET=${1:-${DEFAULT_TARGET}}; shift
 
-    rebuildChangedResourceJars "${SOURCES}"
-    deployGetdownJars "${LOCAL}/*.jar"
+    rebuildChangedResourceJars "${SOURCE}" "${TARGET}"
+    deployGetdownJars "${TARGET}/*.jar"
 
     rebuildGetdownApps
   ;;  
 
   init)
-    if [ ! -z "${CLIENT_RESOURCES_PLAIN}" -a -d "${CLIENT_RESOURCES_PLAIN}" ]; then
+    SOURCE=${1:-${DEFAULT_SOURCE}}; shift
+    TARGET=${1:-${DEFAULT_TARGET}}; shift
+
+    if [ ! -z "${SOURCE}" -a -d "${SOURCE}" ]; then
       if [ ! -z "${CLIENT_RESOURCES_OVERWRITE}" -a -d "${CLIENT_RESOURCES_OVERWRITE}" ]; then
-        cp -r "${CLIENT_RESOURCES_OVERWRITE}"/* "${CLIENT_RESOURCES_PLAIN}"/
+        cp -r "${CLIENT_RESOURCES_OVERWRITE}"/* "${SOURCE}"/
       fi
     
-      rebuildChangedResourceJars "${CLIENT_RESOURCES_PLAIN}"
-      deployGetdownJars "${LOCAL}/*.jar"
+      rebuildChangedResourceJars "${SOURCE}" "${TARGET}"
+      deployGetdownJars "${TARGET}/*.jar"
     fi
     if [ ! -z "${CIDSDISTRIBUTION_HOST}" ]; then
       REGEX_REPLACE='s#'$(echo ${CIDS_CODEBASE} | sed 's/[.[\*^$]/\\&/g')'#'${CIDSDISTRIBUTION_HOST}'#g'
@@ -357,7 +386,7 @@ case "$COMMAND" in
   ;;
 
   *)
-    echo "Usage: $0 init|modifyStarters|deployChanged"
+    echo "Usage: $0 init [source_dir] [target_dir]|deployChanged [source_dir] [target_dir]|modifyStarters"
   ;;
 
 esac

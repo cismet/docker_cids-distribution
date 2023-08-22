@@ -1,8 +1,28 @@
 #!/bin/bash
 
-if [ ! -z "${GIT_TARGET_configs}" ]; then
-  for GIT_TARGET_config in "${GIT_TARGET_configs}"/*; do
-    cp -r "${GIT_TARGET_config}" "${CIDS_DISTRIBUTION_DIR:-/cidsDistribution}/client/"
+# external variables:
+#  CLIENT_CONFIGS_SOURCE       (where are the sources)
+#  CLIENT_CONFIGS_TARGET       (where should the files be copied/rewritten into)
+#  {FILE}_CFG_PROPERTY_{KEY}   (key/value pairs to append to specific config files)
+#  CFG_TEMPLATE_PROPERTY_{KEY} (template replacement entries)
+#  CIDS_DISTRIBUTION_DIR       (comes from the distribution project, almost certainly set to '/cidsDistribution')
+#  CIDS_EXTENSION              (comes from the distribution project, probably 'WuNDa', 'WRRLDBMV' or something like that)
+
+if [ ! -z "${CLIENT_CONFIGS_SOURCE}" ]; then
+  SOURCE=${CLIENT_CONFIGS_SOURCE}
+else
+  SOURCE="${GIT_TARGET_configs}"
+fi
+
+if [ ! -z "${CLIENT_CONFIGS_TARGET}" ]; then
+  TARGET=${CLIENT_CONFIGS_TARGET}
+else
+  TARGET="${CIDS_DISTRIBUTION_DIR}/client"
+fi
+
+if [ ! -z "${SOURCE}" ]; then
+  for SOURCE_ENTRY in "${SOURCE}"/*; do
+    cp -r "${SOURCE_ENTRY}" "${TARGET}"
   done
 fi
 
@@ -25,6 +45,8 @@ for ENV_CFG in $(env | grep -E "${CFG_REGEX}"); do
     APPEND_CFGS+=([${APPEND_FILE}]+=${APPEND_CFG})
     [[ ${APPEND_FILES[*]} =~ "${APPEND_FILE}" ]] || APPEND_FILES+=("${APPEND_FILE}")
 done
+
+CLIENT_CONFIGS="${TARGET}/${CIDS_EXTENSION}/config"
 
 for APPEND_FILE in "${APPEND_FILES[@]}"; do 
     [ "${APPEND_FILE}" != '*' ] && touch "${CLIENT_CONFIGS}/${APPEND_FILE}.cfg"
