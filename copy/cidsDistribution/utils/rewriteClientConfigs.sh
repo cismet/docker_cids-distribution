@@ -21,6 +21,9 @@ else
 fi
 
 if [ ! -z "${SOURCE}" ]; then
+  if [ ! -d "${TARGET}" ]; then
+    mkdir "${TARGET}"
+  fi
   for SOURCE_ENTRY in "${SOURCE}"/*; do
     cp -r "${SOURCE_ENTRY}" "${TARGET}"
   done

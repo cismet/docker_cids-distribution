@@ -92,8 +92,11 @@ function deployGetdownJar {
   srcPath="$1"  
   jarFilename=$(basename ${srcPath})
   targetname=${jarFilename%%.jar}-1.0.jar
-  echo " * deploying ${srcPath} => ${APPLIBS}/${targetname}"
-  cp "${srcPath}" "${APPLIBS}/${targetname}"
+  srcDir=$(dirname "${srcPath}")
+  srcDir="${CIDS_DISTRIBUTION_DIR}/lib/local${CIDS_EXTENSION}" #TODO remove this line when going live
+  src="${srcDir}/${jarFilename}"
+  echo " * deploying ${src} => ${APPLIBS}/${targetname}"
+  cp "${src}" "${APPLIBS}/${targetname}"
 }
 
 #####
@@ -151,8 +154,11 @@ function deployFiles {
   TO="$1"; shift
   FROM="$*"
   echo "# deploying ${FROM} to ${TO}"
+  if [ ! -d "${TO}" ]; then
+    mkdir "${TO}"
+  fi
   for fromPath in ${FROM}; do 
-    if [ -f ${fromPath} ]; then deployFile "${TO}" "${fromPath}"; fi
+    if [ -f ${fromPath} ]; then deployFile "${TO}"/$(basename "${fromPath}") "${fromPath}"; fi
   done
 }
 
@@ -166,18 +172,31 @@ function deployGetdownJars {
 
 #####
 
-function rebuildGetdownApps {
-  echo "### rebuilding getdown starters..."
-  for i in "${CIDS_DISTRIBUTION_DIR}/lib/local${CIDS_EXTENSION}/"*.jar; do 
-    jarfilename=$(basename $i)
-    targetname=${jarfilename%%.jar}-1.0.jar
-    deployFile "${CIDS_DISTRIBUTION_DIR}/apps/.libs/${targetname}" "${i}"
-  done 
+function identifyAppsUsingLibs {
+  changedLibs=$*
 
-  for appDirname in $(ls -1d ${APPS}/* | egrep -h -v "\-public|\-public\-"); do 
-    echo " * building ${appDirname}"
-    java -classpath "${CIDS_DISTRIBUTION_DIR}/lib/m2/com/threerings/getdown/getdown-core/1.8.6/getdown-core-1.8.6.jar" com.threerings.getdown.tools.Digester "${appDirname}" 2> /dev/null
-  done
+  echo "### identifying apps that need to be rebuild"
+
+  result=$(for changedLib in ${changedLibs}; do
+    grep -l '^code = \.\./\.libs/'$(basename "${changedLib}" | sed 's/\./\\./g')'$' ${APPS}/*/getdown.txt
+  done | sort -u | sed 's#/getdown.txt$##g;s#^# * #g')
+  if [ -z "${result}" ]; then
+    echo " * no rebuild needed"
+  else
+    echo "${result}"
+  fi
+}
+
+function rebuildGetdownApps {
+  APPLIST=$*;
+
+  echo "### rebuilding getdown starters..."
+  if [ ! -z "${APPLIST}" ]; then
+    for appDirname in $(ls -1d ${APPLIST}); do 
+      echo " * building ${appDirname}"
+      java -classpath "${CIDS_DISTRIBUTION_DIR}/lib/m2/com/threerings/getdown/getdown-core/1.8.6/getdown-core-1.8.6.jar" com.threerings.getdown.tools.Digester "${appDirname}" 2> /dev/null
+    done
+  fi
 }
 
 #####
@@ -351,18 +370,33 @@ case "$COMMAND" in
 
     modifyJnlpStarters $REGEX_REPLACE
     modifyGetDownStarters $REGEX_REPLACE
-
-    rebuildGetdownApps
+    rebuildGetdownApps ${APPS}/*
   ;;
 
   deployChanged)
     SOURCE=${1:-${DEFAULT_SOURCE}}; shift
     TARGET=${1:-${DEFAULT_TARGET}}; shift
 
-    rebuildChangedResourceJars "${SOURCE}" "${TARGET}"
-    deployGetdownJars "${TARGET}/*.jar"
+    rebuildOutput=$(rebuildChangedResourceJars "${SOURCE}" "${TARGET}")
+    echo "${rebuildOutput}"
 
-    rebuildGetdownApps
+    deployedJars=$(echo "${rebuildOutput}" | grep '^ \* deploying .*' | sed 's#^.* => ##g')
+
+    if [ ! -z "${deployedJars}" ]; then
+      deployedLibsOutput=$(deployGetdownJars ${deployedJars})
+      echo "${deployedLibsOutput}"
+      deployedLibs=$(echo "${deployedLibsOutput}" | grep '^ \* deploying .*' | sed 's#^.* => ##g')
+    fi
+
+    if [ ! -z "${deployedLibs}" ]; then
+      appsToRebuildOutput=$(identifyAppsUsingLibs "$deployedLibs")
+      echo "${appsToRebuildOutput}"
+      appsToRebuild=$(echo "${appsToRebuildOutput}" | grep -v '^ \* no rebuild needed' | grep '^ \*' | awk '{print $2}')
+    fi
+
+    if [ ! -z "${appsToRebuild}" ]; then
+      rebuildGetdownApps ${appsToRebuild}
+    fi
   ;;  
 
   init)
@@ -382,7 +416,7 @@ case "$COMMAND" in
       modifyJnlpStarters $REGEX_REPLACE
       modifyGetDownStarters $REGEX_REPLACE
     fi
-    rebuildGetdownApps
+    rebuildGetdownApps ${APPS}/*
   ;;
 
   *)
