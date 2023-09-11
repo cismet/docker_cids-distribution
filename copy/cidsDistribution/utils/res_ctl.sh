@@ -279,8 +279,7 @@ function modifyJnlpStarters {
     && (
         echo " * no changes detected for ${STARTER_JNLP}" \
         && rm "${STARTER_TMP}" \
-        && continue
-    );
+    ) && continue;
 
     # create security jar
     SECURITY_NAME=${STARTER_NAME%%-starter.jnlp}_security
@@ -409,13 +408,13 @@ case "$COMMAND" in
       fi
     
       rebuildChangedResourceJars "${SOURCE}" "${TARGET}"
-      deployGetdownJars "${TARGET}/*.jar"
     fi
     if [ ! -z "${CIDSDISTRIBUTION_HOST}" ]; then
       REGEX_REPLACE='s#'$(echo ${CIDS_CODEBASE} | sed 's/[.[\*^$]/\\&/g')'#'${CIDSDISTRIBUTION_HOST}'#g'
       modifyJnlpStarters $REGEX_REPLACE
       modifyGetDownStarters $REGEX_REPLACE
     fi
+    deployGetdownJars "${TARGET}/*.jar"
     rebuildGetdownApps ${APPS}/*
   ;;
 
