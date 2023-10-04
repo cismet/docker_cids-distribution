@@ -37,11 +37,13 @@ RUN chmod +x ${CIDS_DISTRIBUTION_DIR}/utils/*.sh \
 # install csconf
 RUN git clone https://github.com/cismet/cs-conf.git /usr/local/src/cs-conf \
   && cd /usr/local/src/cs-conf \
-  && npm install -g @babel/node \
-  && npm install @babel/cli @babel/preset-env --save-dev \
+  && npm install -g @babel/core @babel/node \
+  && npm install @babel/core @babel/cli @babel/preset-env --save-dev \
   && npm run test \
   && npm run build \
   && npm install -g
+
+RUN ln -s /usr/local/bin/babel-node /usr/bin/babel-node
 
 # expose cids-server port
 EXPOSE 9986
