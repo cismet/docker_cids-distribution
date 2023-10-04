@@ -72,12 +72,31 @@ EOF
 }
 
 csconf_import() {
-    if [ -d "${CSCONF_CONFIG_DIR}" ]; then
-        CIDS_CTL_FILE="${SERVERS_PATH}/.cids_ctl"
-        source "${CIDS_CTL_FILE}"
+    CIDS_CTL_FILE="${SERVERS_PATH}/.cids_ctl"
+    source "${CIDS_CTL_FILE}"
 
-        csconf import -r "${RUNTIME_PROPERTIES}" -c "${CSCONF_CONFIG_DIR}" -b "${CSCONF_BACKUPS_DIR}" -v
+    ### preventing that files change by another process while importing
+    CSCONF_IMPORT_DIR="/tmp/csconf-import_$(echo $RANDOM | md5sum | head -c 20)"
+
+    cp -r "${GIT_TARGET_csconf}" "${CSCONF_IMPORT_DIR}"
+    cd "${CSCONF_IMPORT_DIR}"
+
+    git reset --hard HEAD
+    git checkout "${GIT_BRANCH}"
+    git pull origin "${GIT_BRANCH}"
+
+    IMPORT_CMD="${CSCONF_BIN:="csconf"} import -b "${CSCONF_BACKUPS_DIR}" -v"
+
+    if [[ "'"$CI_COMMIT_MESSAGE"'" =~ \[no-import\] ]]; then
+    $(echo "${IMPORT_CMD}")
+    echo "----------"
+    echo "commit message contains [no-import], therefore no import is executed"
+    else   
+    $(echo "${IMPORT_CMD} -X")
     fi
+
+    cd -
+    rm -r ${CSCONF_IMPORT_DIR}
 }
 
 csconf_updatePermissions() {
