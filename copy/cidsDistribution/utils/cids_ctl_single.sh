@@ -72,6 +72,7 @@ EOF
 }
 
 csconf_import() {
+    EXECUTE_FLAG=$1
     CIDS_CTL_FILE="${SERVERS_PATH}/.cids_ctl"
     source "${CIDS_CTL_FILE}"
 
@@ -87,13 +88,7 @@ csconf_import() {
 
     IMPORT_CMD="${CSCONF_BIN:="csconf"} import -b "${CSCONF_BACKUPS_DIR}" -v"
 
-    if [[ "'"$CI_COMMIT_MESSAGE"'" =~ \[no-import\] ]]; then
-    $(echo "${IMPORT_CMD}")
-    echo "----------"
-    echo "commit message contains [no-import], therefore no import is executed"
-    else   
-    $(echo "${IMPORT_CMD} -X")
-    fi
+    $(echo "${IMPORT_CMD} ${EXECUTE_FLAG}")
 
     cd -
     rm -r ${CSCONF_IMPORT_DIR}
@@ -187,7 +182,8 @@ case "$1" in
     ;;
 
     csconf-import)
-        csconf_import
+	EXECUTE_FLAG=$2
+        csconf_import ${EXECUTE_FLAG}
     ;;
 
     csconf-updatePermissions)
