@@ -5,6 +5,8 @@ PASSWORD=$2
 OLD_PASSWORD=$3
 TIMESTAMP=$4
 
+CSCONF_BIN=${CSCONF_BIN:=/cidsDistribution/utils/csconf}
+
 echo "changing password for '${LOGIN_NAME}'"
 
 if [ "${PASSWORD}" == "${OLD_PASSWORD}" ]; then
@@ -26,7 +28,7 @@ OLD_USER=$(cat usermanagement.json | jq '.[] | select(.login_name == "'${LOGIN_N
 OLD_HASH=$(echo ${OLD_USER} | jq -r '.pw_hash')
 OLD_SALT=$(echo ${OLD_USER} | jq -r '.salt')
 
-TST_USER=$(/cidsDistribution/utils/csconf password -u "${LOGIN_NAME}" -p "${OLD_PASSWORD}" -s "${OLD_SALT}" -Pq)
+TST_USER=$(${CSCONF_BIN} password -u "${LOGIN_NAME}" -p "${OLD_PASSWORD}" -s "${OLD_SALT}" -Pq)
 TST_HASH=$(echo ${TST_USER} | jq -r '.pw_hash')
 
 if [ "${TST_HASH}" != "${OLD_HASH}" ]; then
@@ -36,7 +38,7 @@ fi
 
 TIME=$(date -d "@$((${TIMESTAMP} / 1000))" "+%d.%m.%Y, %H:%M:%S")
 
-NEW_USER=$(/cidsDistribution/utils/csconf password -u "${LOGIN_NAME}" -p "${PASSWORD}" -t "${TIME}" -q)
+NEW_USER=$(${CSCONF_BIN} password -u "${LOGIN_NAME}" -p "${PASSWORD}" -t "${TIME}" -q)
 
 echo "${NEW_USER}" | jq '{ "login_name": .login_name, "pw_hash": .pw_hash, "salt": .salt, "last_pwd_change": .last_pwd_change }'
 
