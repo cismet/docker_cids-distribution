@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IMAGE_NAME=reg.cismet.de/abstract/cids-distribution
-IMAGE_VERSION=8.2-debian
+IMAGE_VERSION=9.0-debian
 
 
 # RELEASE BUILD ----------------------------------------------------------------
