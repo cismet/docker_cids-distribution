@@ -1,4 +1,4 @@
-FROM reg.cismet.de/abstract/cids-distribution-base:9.0-debian
+FROM reg.cismet.de/abstract/cids-distribution-base:9.0.1-debian
 
 # override account extension and codebase in child autodistribution images!
 ENV CIDS_ACCOUNT_EXTENSION  CidsDistribution
