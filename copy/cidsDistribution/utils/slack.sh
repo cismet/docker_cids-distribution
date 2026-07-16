@@ -185,6 +185,11 @@ else
 	injectableOutput=""
 fi
 
+#escape new lines
+injectableOutput=$(printf '%s' "$injectableOutput" | sed ':a;N;$!ba;s/\n/\\n/g')
+#escape quotes
+injectableOutput==$(printf '%s' "$injectableOutput" | sed 's/"/\\"/g')
+
 PAYLOAD="payload={\"channel\": \"$channel\", \"username\": \"$username\", \"text\": \"$message$injectableOutput\", \"icon_emoji\": \"$icon\"}"
 
 SLACKERMSG="/usr/bin/curl -X POST --data-urlencode '$PAYLOAD' $hook"
